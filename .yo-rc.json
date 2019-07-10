@@ -1,0 +1,27 @@
+{
+  "generator-bcdk": {
+    "promptValues": {
+      "modules": {
+        "jenkins": {
+          "path": ".jenkins",
+          "namespace": "gtncer-tools",
+          "name": "jenkins",
+          "version": "1.0.0",
+          "environments": {
+            "dev": {
+              "namespace": "gtncer-tools"
+            },
+            "prod": {
+              "namespace": "gtncer-tools"
+            }
+          },
+          "jenkinsJobName": "_jenkins",
+          "github_owner": "david-kerins",
+          "github_repo": "pr-pipeline-python-hello",
+          "jenkinsFilePath": ".jenkins/Jenkinsfile",
+          "uuid": "5a504832-320b-4d02-aea7-a71099bb4d9d"
+        }
+      }
+    }
+  }
+}
