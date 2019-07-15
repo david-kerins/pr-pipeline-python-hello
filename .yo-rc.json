@@ -71,6 +71,13 @@
               "namespace": "gtncer-prod"
             }
           }
+        },
+        ".": {
+          "jenkinsJobName": "hello",
+          "github_owner": "david-kerins",
+          "github_repo": "pr-pipeline-python-hello",
+          "jenkinsFilePath": "Jenkinsfile",
+          "uuid": "4d5e1ced-0b5b-4d1d-af99-801ddb4491a2"
         }
       }
     }
