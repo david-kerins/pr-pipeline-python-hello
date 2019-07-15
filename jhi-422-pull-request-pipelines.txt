@@ -1,0 +1,82 @@
+feature/jhi-422-pull-request-pipelines
+
+pr-pipeline personal access token
+0184383eead404c0fb73879758839eeb64cc0cae
+
+
+bash-3.2$ yo bcdk:jenkins
+bash-3.2$ cd .jenkins/.pipeline/
+bash-3.2$ npm i
+bash-3.2$ DEBUG=* npm run build -- --pr=0 --dev-mode=true
+
+The build command threw errors b/c it wants to pull images from a 'bcgov' namespace, which didn't exist on BitBox cluster.
+
+Had to create bcgov namespace in bitbox cluster.
+
+# get a valid login token from pathfinder.
+# i.e. oc login https://console.pathfinder.gov.bc.ca:8443 --token=j3Z252AHvoHLcEJj9v9Wc4uVCdoRxrqvGe6TaLIVLo0
+
+# Create a secret using the username/token from https://console.pathfinder.gov.bc.ca:8443/console/command-line
+oc -n bcgov create secret docker-registry pathfinder \
+    '--docker-server=docker-registry.pathfinder.gov.bc.ca' \
+    "--docker-username=david-kerins" \
+    "--docker-password=j3Z252AHvoHLcEJj9v9Wc4uVCdoRxrqvGe6TaLIVLo0"
+
+# Use secret for pulling images for pods
+oc -n bcgov secrets link default pathfinder --for=pull
+
+# use a secret for pushing and pulling build images
+oc -n bcgov secrets link builder pathfinder
+
+# Import/Pull images
+oc -n bcgov import-image jenkins-basic --from=docker-registry.pathfinder.gov.bc.ca:443/bcgov/jenkins-basic --confirm --insecure --reference-policy=local --all
+
+oc -n bcgov import-image postgis-96:v1-latest --from=docker-registry.pathfinder.gov.bc.ca:443/bcgov/postgis-96:v1-latest --confirm --insecure --reference-policy=local
+
+# Untested: Fix registry reference
+# minishift openshift config set --patch '{"imageConfig": {"internalRegistryHostname": "docker-registry.default.svc:5000"}}' --target master
+
+
+# Re-ran the build command
+
+bash-3.2$ DEBUG=* npm run build -- --pr=0 --dev-mode=true
+
+# The above allowed the build to succeed.
+
+bash-3.2$ DEBUG=* npm run deploy -- --pr=0 --env=dev
+
+Failed to get storageclasses/storage.k8s.io/v1/gluster-file (status 404)
+storageclass.storage.k8s.io "gluster-file" not found
+
+
+Creating a PV with the following worked...
+
+spec:
+  storageClassName: gluster-file
+  
+
+
+Routes need to be changed.
+
+Needed to change the ROUTE_HOST before deploying to non-pathfinder environment.
+
+find . -type f -exec grep -H bitbox {} \;
+./.pipeline/lib/deploy.js:      'ROUTE_HOST': `${phases[phase].name}${phases[phase].suffix}-${phases[phase].namespace}.ocp.bitbox.ca`
+
+
+
+bash-3.2$ DEBUG=* npm run deploy -- --pr=0 --env=prod
+
+#  IF you need to clean up a deployment, run the following...   bash-3.2$ DEBUG=* npm run clean -- --pr=0 --env=dev
+
+
+pwd
+cd ..
+cd ..
+pwd                                                                                                                             
+/Users/dkerins/RSI/github/pr-pipeline-python-hello
+
+yo bcdk:pipeline
+
+
+
