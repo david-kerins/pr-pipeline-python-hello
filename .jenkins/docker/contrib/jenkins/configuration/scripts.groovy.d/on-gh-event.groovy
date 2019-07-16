@@ -63,9 +63,9 @@ static Map exec(List args, File workingDirectory=null, Appendable stdout=null, A
                     println "Clone Url:${cloneUrl}"
                     println "Checkout Branch:${sourceBranch}"
 
-                    String selector = "env-id=${payload.number},env-name!=prod,github-owner=${repoOwner},github-repo=${repoName},!shared"
+                    String selector = "env-id=${payload.number},env-name!=prod,env-name!=test,github-owner=${repoOwner},github-repo=${repoName},!shared"
 
-                    def ocGetProjects = exec(['oc','get','projects','-l','env!=prod', '-o', 'custom-columns=name:.metadata.name', '--no-headers'])
+                    def ocGetProjects = exec(['oc','get','projects','-l','environment!=prod,environment!=test', '-o', 'custom-columns=name:.metadata.name', '--no-headers'])
 
                     ocGetProjects.out.toString().trim().split('\n').each({ namespace ->
                         //BuildConfig Output Images
