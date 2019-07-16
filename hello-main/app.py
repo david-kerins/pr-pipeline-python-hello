@@ -3,6 +3,7 @@ import platform
 app = Flask(__name__)
 
 
+
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def dump_headers(path):
